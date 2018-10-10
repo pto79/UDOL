@@ -1,5 +1,9 @@
 package online.dragon.ultima;
 
+import online.dragon.ultima.module.item.*;
+
+import java.util.Date;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -22,7 +26,12 @@ public class UDOLService {
 	
 	@POST
 	public void createItem() {
-		
+		UDOLItem cItem = new UDOLItem();
+		cItem.setsName("apple");
+		cItem.setiAmount(1);
+		Date d = new Date();
+		cItem.setiCreationTime(d.toString());
+		// add to world object in memory
 	}
 	
 }
