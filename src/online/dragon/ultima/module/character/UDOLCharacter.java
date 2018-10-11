@@ -1,8 +1,10 @@
 package online.dragon.ultima.module.character;
 
+import java.io.Serializable;
+
 import online.dragon.ultima.module.UDOLSkill;
 
-public class UDOLCharacter {
+public class UDOLCharacter implements Serializable {
 	private int		iCharacterID = 0;
 	private String 	sName = "";
 	private String	sImage = "";
@@ -18,6 +20,38 @@ public class UDOLCharacter {
 	private int		iInt = 0;
 	
 	private UDOLSkill	cSkill;
+
+	public int getiCharacterID() {
+		return iCharacterID;
+	}
+
+	public void setiCharacterID(int iCharacterID) {
+		this.iCharacterID = iCharacterID;
+	}
+
+	public String getsImage() {
+		return sImage;
+	}
+
+	public void setsImage(String sImage) {
+		this.sImage = sImage;
+	}
+
+	public int getiCreationTime() {
+		return iCreationTime;
+	}
+
+	public void setiCreationTime(int iCreationTime) {
+		this.iCreationTime = iCreationTime;
+	}
+
+	public int getiCreationBy() {
+		return iCreationBy;
+	}
+
+	public void setiCreationBy(int iCreationBy) {
+		this.iCreationBy = iCreationBy;
+	}
 
 	public String getsName() {
 		return sName;

@@ -1,6 +1,8 @@
 package online.dragon.ultima.module.item;
 
-public class UDOLItem {
+import java.io.Serializable;
+
+public class UDOLItem implements Serializable {
 	private int		iItemID = 0;
 	private String 	sName	= "";
 	
