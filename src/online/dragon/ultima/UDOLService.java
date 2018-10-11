@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 public class UDOLService {
 	private static int counter = 0;
 	private static List<Object> objWorld = null;
+	private List<Object> objMyWorld = null;
 	
 	//getClasses will trig this every time while getSingletons will not
 	public UDOLService() {
@@ -102,5 +103,13 @@ public class UDOLService {
 	@Path("world")
 	public Response getWorld() {
 		return Response.status(Status.OK).entity(objWorld).build();
+	}
+	
+	@GET
+	@Path("getMyWorld")
+	public Response getMyWorld() {
+		for (int i = 0; i < objWorld.size(); i++) {
+			if (objWorld.get(i) )
+		}
 	}
 }
