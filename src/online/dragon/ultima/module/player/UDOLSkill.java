@@ -1,4 +1,4 @@
-package online.dragon.ultima.module;
+package online.dragon.ultima.module.player;
 
 public class UDOLSkill {
 	

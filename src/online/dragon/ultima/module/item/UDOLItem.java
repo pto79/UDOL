@@ -18,6 +18,7 @@ public class UDOLItem implements Serializable {
 	
 	private boolean	bBlessed = false;
 	private int		iPrice = 0;
+	private int		iColor = 0;
 	
 	public UDOLItem() {
 		super();
@@ -110,6 +111,14 @@ public class UDOLItem implements Serializable {
 
 	public void setiPrice(int iPrice) {
 		this.iPrice = iPrice;
+	}
+
+	public int getiColor() {
+		return iColor;
+	}
+
+	public void setiColor(int iColor) {
+		this.iColor = iColor;
 	}
 	
 	

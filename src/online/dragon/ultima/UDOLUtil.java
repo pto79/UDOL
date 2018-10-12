@@ -9,7 +9,10 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
+
+import online.dragon.ultima.module.character.UDOLPlayer;
 
 public class UDOLUtil {
 	// save uploaded file to new location
@@ -41,11 +44,25 @@ public class UDOLUtil {
 		oos.close();		
 	}
 	
-	public static List<Object> loadWorldFile() throws FileNotFoundException, IOException, ClassNotFoundException {
-		List<Object> worldObject = null;
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream("D:\\save\\world.bin"));
-		worldObject = (List<Object>) ois.readObject();
-		ois.close();
+	public static List<Object> loadWorldFile() {
+		List<Object> worldObject = new ArrayList<Object>();
+		ObjectInputStream ois = null;
+		
+		try {
+			ois = new ObjectInputStream(new FileInputStream("D:\\save\\world.bin"));
+			worldObject = (List<Object>) ois.readObject();
+			ois.close();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return worldObject;
 	}
 }

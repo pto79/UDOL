@@ -1,4 +1,4 @@
-package online.dragon.ultima;
+package online.dragon.ultima.account;
 
 public enum UDOLAccountStatus {
 	pending,

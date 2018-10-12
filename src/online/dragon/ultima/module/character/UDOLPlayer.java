@@ -5,6 +5,7 @@ public class UDOLPlayer extends UDOLCharacter {
 	public UDOLPlayer() {
 		super();
 		// TODO Auto-generated constructor stub
+		this.setcBrain(UDOLBrain.player);
 	}
 
 }
