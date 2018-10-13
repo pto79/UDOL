@@ -2,6 +2,7 @@ package online.dragon.ultima.module.character;
 
 import java.io.Serializable;
 
+import online.dragon.ultima.misc.UDOLConst;
 import online.dragon.ultima.module.player.UDOLSkill;
 
 public class UDOLCharacter implements Serializable {
@@ -12,14 +13,14 @@ public class UDOLCharacter implements Serializable {
 	private int		iLocationX = 0;
 	private int 	iLocationY = 0;
 	
-	private	String	strCreationTime = "";
+	private	String	sCreationTime = "";
 	private int		iCreationBy	= 0;
 	
 	private int		iStr = 0;
 	private int		iDex = 0;
 	private int		iInt = 0;
 	
-	private UDOLBrain 	cBrain;
+	private int 	iBrain = 0;
 	private UDOLSkill	cSkill;
 
 	public int getiCharacterID() {
@@ -38,12 +39,12 @@ public class UDOLCharacter implements Serializable {
 		this.sImage = sImage;
 	}
 
-	public String getstrCreationTime() {
-		return strCreationTime;
+	public String getsCreationTime() {
+		return sCreationTime;
 	}
 
-	public void setstrCreationTime(String string) {
-		this.strCreationTime = string;
+	public void setsCreationTime(String string) {
+		this.sCreationTime = string;
 	}
 
 	public int getiCreationBy() {
@@ -102,12 +103,12 @@ public class UDOLCharacter implements Serializable {
 		this.iInt = iInt;
 	}
 
-	public UDOLBrain getcBrain() {
-		return cBrain;
+	public int getcBrain() {
+		return iBrain;
 	}
 
-	public void setcBrain(UDOLBrain cBrain) {
-		this.cBrain = cBrain;
+	public void setcBrain(int iBrain) {
+		this.iBrain = iBrain;
 	}
 
 	public UDOLSkill getcSkill() {
@@ -118,18 +119,18 @@ public class UDOLCharacter implements Serializable {
 		this.cSkill = cSkill;
 	}
 	
-	public void move(UDOLDirection direction) {
+	public void move(int direction) {
 		switch (direction) {
-		case up:
+		case UDOLConst.up:
 			this.setiLocationY(this.getiLocationY()-1);
 			break;
-		case down:
+		case UDOLConst.down:
 			this.setiLocationY(this.getiLocationY()+1);
 			break;
-		case left:
+		case UDOLConst.left:
 			this.setiLocationX(this.getiLocationX()-1);
 			break;
-		case right:
+		case UDOLConst.right:
 			this.setiLocationX(this.getiLocationX()+1);
 			break;
 		}

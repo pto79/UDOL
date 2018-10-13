@@ -1,6 +1,6 @@
 package online.dragon.ultima.module.character;
 
-import online.dragon.ultima.module.player.UDOLSkill;
+import online.dragon.ultima.misc.UDOLConst;
 
 public class UDOLAnimal extends UDOLCharacter {
 	
@@ -10,6 +10,23 @@ public class UDOLAnimal extends UDOLCharacter {
 	public UDOLAnimal() {
 		super();
 		// TODO Auto-generated constructor stub
-		this.setcBrain(UDOLBrain.animal);
+		this.setcBrain(UDOLConst.animal);
 	}
+
+	public int getiOwner() {
+		return iOwner;
+	}
+
+	public void setiOwner(int iOwner) {
+		this.iOwner = iOwner;
+	}
+
+	public int getiHunger() {
+		return iHunger;
+	}
+
+	public void setiHunger(int iHunger) {
+		this.iHunger = iHunger;
+	}
+	
 }

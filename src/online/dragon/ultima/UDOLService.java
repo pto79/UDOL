@@ -2,20 +2,21 @@ package online.dragon.ultima;
 
 import online.dragon.ultima.module.item.*;
 import online.dragon.ultima.module.player.*;
+import online.dragon.ultima.account.UDOLAccount;
+import online.dragon.ultima.misc.UDOLConst;
 import online.dragon.ultima.module.character.*;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -23,9 +24,10 @@ import javax.ws.rs.core.Response.Status;
 public class UDOLService {
 
 	private static final int sizeOfWorld = 50;
-	private static volatile List<Object> objWorld = null;
-	private static volatile List<UDOLPlayer> lstPlayer = null;
-	private List<Object> objMyWorld = null;
+	public static volatile List<Object> objWorld = null;
+	public static volatile List<UDOLPlayer> lstPlayer = null;
+	public static volatile List<UDOLAccount> lstAccount = null;
+	private List<Object> myWorld = null;
 	private UDOLPlayer myCharacter = null;
 	
 	//getClasses will trig this every time while getSingletons will not
@@ -35,7 +37,7 @@ public class UDOLService {
 		
 		//objWorld = new ArrayList<Object>();
 		lstPlayer = new ArrayList<UDOLPlayer>();
-		
+		lstAccount = UDOLUtil.loadAccountFile();
 		objWorld = UDOLUtil.loadWorldFile();
 	}
 	
@@ -45,8 +47,7 @@ public class UDOLService {
 		UDOLItem cItem = new UDOLItem();
 		cItem.setsName("apple");
 		cItem.setiAmount(1);
-		Date d = new Date();
-		cItem.setiCreationTime(d.toString());
+		cItem.setiCreationTime(UDOLUtil.getTime());
 
 		// add to world object in memory
 		objWorld.add(cItem);
@@ -55,17 +56,19 @@ public class UDOLService {
 	}
 	
 	@POST
-	@Path("world")
-	public void saveWorld() {
-		try {
+	@Path("world/{action}")
+	public Response gameWorld(@PathParam("action") int action) {
+		if ((myCharacter == null) || (myCharacter.getiLevel() != UDOLConst.lvlOwner))
+			return Response.status(Status.UNAUTHORIZED).build();
+		
+		switch (action) {
+		case UDOLConst.saveWorld:
 			UDOLUtil.saveWorldFile(objWorld);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			break;
+		case UDOLConst.getWorld:
+			break;
 		}
+		return Response.status(Status.OK).entity(objWorld).build();
 	}
 	
 	@POST
@@ -83,32 +86,24 @@ public class UDOLService {
 		cPlayer.setiDex(100);
 		cPlayer.setiInt(100);
 		cPlayer.setcSkill(cSkill);
-		
-		Date d = new Date();
-		cPlayer.setstrCreationTime(d.toString());		
+		cPlayer.setsCreationTime(UDOLUtil.getTime());		
 		
 		objWorld.add(cPlayer);
 		cPlayer.setiCharacterID(objWorld.indexOf(cPlayer));
 		objWorld.set(cPlayer.getiCharacterID(), cPlayer);
 	}
 	
-	@GET
-	@Path("world")
-	public Response getWorld() {
-		return Response.status(Status.OK).entity(objWorld).build();
-	}
-	
+
 	@GET
 	@Path("showMyWorld")
 	public Response showMyWorld() {
-		return Response.status(Status.OK).entity(objMyWorld).build();
+		return Response.status(Status.OK).entity(myWorld).build();
 	}
 	
 	private void getMyWorld(int iPlayerX, int iPlayerY) 
 	{
-		boolean bResult = false;
 		Object objTemp = null;
-		objMyWorld.clear();
+		myWorld.clear();
 		
 		for (int i = 0; i < objWorld.size(); i++) 
 		{
@@ -121,7 +116,7 @@ public class UDOLService {
 					(cItem.getiLocationX() >= iPlayerX - sizeOfWorld) &&
 					(cItem.getiLocationY() <= iPlayerY + sizeOfWorld) &&
 					(cItem.getiLocationY() >= iPlayerY - sizeOfWorld)) {
-						objMyWorld.add(cItem);
+					myWorld.add(cItem);
 				}
 			}
 			
@@ -132,7 +127,7 @@ public class UDOLService {
 					(cCharacter.getiLocationX() >= iPlayerX - sizeOfWorld) &&
 					(cCharacter.getiLocationY() <= iPlayerY + sizeOfWorld) &&
 					(cCharacter.getiLocationY() >= iPlayerY - sizeOfWorld)) {
-						objMyWorld.add(cCharacter);
+					myWorld.add(cCharacter);
 				}
 			}
 		}
@@ -140,7 +135,7 @@ public class UDOLService {
 	
 	//find player in the world file based on player id
 	//add player in the online player list	
-	private boolean updatePlayerList(int iPlayerID)
+	private boolean updatePlayerList(int iPlayerID, boolean logout)
 	{
 		boolean bResult = false;
 		Object objTemp = null;
@@ -163,43 +158,63 @@ public class UDOLService {
 	}
 	
 	@POST
-	@Path("login/{playerID}")
-	public Response userLogin(@PathParam("playerID") int iPlayerID) {
-		boolean bResult = true;
+	@Path("account")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response accountAction(UDOLAccount account) {
 
-		if(bResult)
-		{
-			//find and add player to list
-			if(!updatePlayerList(iPlayerID))
+		switch (account.getiAction()) {
+		case UDOLConst.login:
+			int playerID = UDOLAccount.login(lstAccount, account.getsUsername(), account.getsPassword());
+			
+			if(playerID == -1)
+				return Response.status(Status.UNAUTHORIZED).build();
+			
+			if(!updatePlayerList(playerID, false))
 				return Response.status(Status.NOT_FOUND).build();
 			
 			// get player's world and return to client
-			objMyWorld = new ArrayList<Object>();
+			myWorld = new ArrayList<Object>();
 			getMyWorld(myCharacter.getiLocationX(), myCharacter.getiLocationY());
+			return Response.status(Status.OK).entity(myWorld).build();
 			
-			return Response.status(Status.OK).entity(objMyWorld).build();
+		case UDOLConst.logout:
+			lstPlayer.remove(myCharacter);
+			myCharacter = null;
+			break;
+			
+		case UDOLConst.register:
+			UDOLAccount newAccount = new UDOLAccount();
+			newAccount = account;
+			if(!newAccount.register(lstAccount))
+				return Response.status(Status.CONFLICT).build();
+			
+		case UDOLConst.saveAccount:
+			UDOLUtil.saveAccountFile(lstAccount);
+			break;
+		
+		case UDOLConst.getAccount:
+			return Response.status(Status.OK).entity(lstAccount).build();
 		}
-		else
-		{
-			return Response.status(Status.UNAUTHORIZED).build();
-		}
+		return Response.status(Status.OK).build();
 	}
 	
 	@POST
-	@Path("/playerAction")
-	public Response playerAction(
-			@QueryParam("actionID") @DefaultValue("none") UDOLAction eActionID,
-			@QueryParam("direction") @DefaultValue("stop") UDOLDirection eDirection)
+	@Path("playerAction")
+	public Response playerAction(@QueryParam("actionID") int actionID,
+			@QueryParam("direction") int direction)
 	{
-		switch (eActionID)
+		if (myCharacter == null)
+			return Response.status(Status.SERVICE_UNAVAILABLE).build();
+		
+		switch (actionID)
 		{
-			case move:
-				myCharacter.move(eDirection);
+			case UDOLConst.move:
+				myCharacter.move(direction);
 				getMyWorld(myCharacter.getiLocationX(), myCharacter.getiLocationY());
 				break;
-			case none:
+			default:
 				break;
 		}
-		return Response.status(Status.OK).entity(objMyWorld).build(); 
+		return Response.status(Status.OK).entity(myWorld).build(); 
 	}
 }

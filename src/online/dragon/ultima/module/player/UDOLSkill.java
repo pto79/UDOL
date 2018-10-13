@@ -1,6 +1,8 @@
 package online.dragon.ultima.module.player;
 
-public class UDOLSkill {
+import java.io.Serializable;
+
+public class UDOLSkill implements Serializable {
 	
 	// Fighter
 	private int	sMeleeWeapon = 0;
